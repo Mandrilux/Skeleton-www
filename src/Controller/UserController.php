@@ -21,15 +21,38 @@ class UserController extends AbstractController
     }
 
     /**
-    * @Route("/user/{email}", methods={"GET"}, name="get_user")
+    * @Route("/user", methods={"GET"}, name="get_users")
     */
+
+    public function AllUser()
+    {
+      $repository = $this->getDoctrine()
+                   ->getManager()
+                   ->getRepository('App\Entity\User');
+      $user = $repository->findAll();
+      if ($user == NULL)
+      {
+        $data = json_encode(array(
+            "error"=> "Erreur !"
+        ));
+        $response =  new Response($data);
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+      }
+      $data = $this->serializer->serialize($user, 'json');
+      $response =  new Response($data);
+      $response->headers->set('Content-Type', 'application/json');
+      return $response;
+    }
+
+
 
     public function OneUser($email)
     {
       $repository = $this->getDoctrine()
                    ->getManager()
                    ->getRepository('App\Entity\User');
-
       $user = $repository->findOneBy(array('email' => $email));
       if ($user == NULL)
       {
