@@ -14,7 +14,6 @@ use JMS\Serializer\SerializerInterface;
 class UserController extends AbstractController
 {
     private $serializer;
-    private $validator;
 
     public function __construct(SerializerInterface $serializer){
       $this->serializer= $serializer;
@@ -47,7 +46,10 @@ class UserController extends AbstractController
     }
 
 
-
+    /**
+    * @Route("/user/{email}", methods={"GET"}, name="get_user")
+    */
+    
     public function OneUser($email)
     {
       $repository = $this->getDoctrine()
