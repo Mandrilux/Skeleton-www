@@ -6,6 +6,9 @@
         <title>TOTOTOTO</title>
     </head>
     <body>
+        <div id="header">
+          <p> Epi Wac API 2019 strasbourg </p>
+        </div>
         <div id="users">
             azeazeaze
         </div>
@@ -13,11 +16,10 @@
 </html>
 
 
-<script>
 
+<script>
 setInterval(function() {
   console.log("toto");
-
   var request = new Request("/user", {
     method: 'GET',
     headers: new Headers()
