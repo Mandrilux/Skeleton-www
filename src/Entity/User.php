@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity("email")
@@ -30,7 +31,8 @@ class User
 
     /**
      * @ORM\Column(name="email", type="string", length=100, unique=true)
-     * @Assert\Email(message="email created")
+     * @Assert\Email(message="Mauvais format d'email")
+     * @Assert\Length(min="14", max="150", minMessage="Mauvais format d'email", maxMessage="Mauvais format d'email")
      */
 
     private $email;

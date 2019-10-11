@@ -21,17 +21,30 @@ class UserController extends AbstractController
     }
 
     /**
-    * @Route("/user", methods={"GET"}, name="get_user")
+    * @Route("/user/{email}", methods={"GET"}, name="get_user")
     */
 
-    public function OneUser()
+    public function OneUser($email)
     {
-      echo "ok";
-      exit(0);
-    /*  $data = $this->serializer->serialize($league, 'json');
+      $repository = $this->getDoctrine()
+                   ->getManager()
+                   ->getRepository('App\Entity\User');
+
+      $user = $repository->findOneBy(array('email' => $email));
+      if ($user == NULL)
+      {
+        $data = json_encode(array(
+            "error"=> "Utilisateur inconnu !"
+        ));
+        $response =  new Response($data);
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+      }
+      $data = $this->serializer->serialize($user, 'json');
       $response =  new Response($data);
       $response->headers->set('Content-Type', 'application/json');
-      return $response;*/
+      return $response;
     }
 
 
@@ -42,9 +55,21 @@ class UserController extends AbstractController
    {
     $data = $request->getContent();
     $user =  $this->serializer->deserialize($data, 'App\Entity\User', 'json');
+    $user->init();
 
-    $acceptedDomains = array('epitech.eu');
+    $errors = $validator->validate($user);
+    if (count($errors) > 0) {
+         $errorsString = $errors[0]->getMessage();
+         $data = json_encode(array(
+             "error"=> $errorsString
+         ));
+         $response =  new Response($data);
+         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+         $response->headers->set('Content-Type', 'application/json');
+         return $response;
+     }
 
+     $acceptedDomains = array('epitech.eu');
     if(!in_array(substr($user->getEmail(), strrpos($user->getEmail(), '@') + 1), $acceptedDomains))
     {
       $data = json_encode(array(
@@ -55,36 +80,6 @@ class UserController extends AbstractController
       $response->headers->set('Content-Type', 'application/json');
       return $response;
     }
-
-    if (strlen($user->getEmail())  < strlen("epitech.eu") + 4)
-    {
-      $data = json_encode(array(
-          "error"=> "Email invalide (prenom.nom@epitech.eu)"
-      ));
-      $response =  new Response($data);
-      $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-      $response->headers->set('Content-Type', 'application/json');
-      return $response;
-    }
-
-    $user->init();
-
-    $errors = $validator->validate($user);
-    if (count($errors) > 0) {
-         /*
-          * Uses a __toString method on the $errors variable which is a
-          * ConstraintViolationList object. This gives us a nice string
-          * for debugging.
-          */
-         $errorsString = $errors[0]->getMessage();
-         $data = json_encode(array(
-             "error"=> $errorsString
-         ));
-         $response =  new Response($data);
-         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-         $response->headers->set('Content-Type', 'application/json');
-         return $response;
-     }
 
     $em = $this->getDoctrine()->getManager();
     $em->persist($user);
