@@ -1,0 +1,11 @@
+vendor/
+var/cache
+var/log
+var/session
+
+###> symfony/web-server-bundle ###
+/.web-server-pid
+###< symfony/web-server-bundle ###
+
+.env
+
