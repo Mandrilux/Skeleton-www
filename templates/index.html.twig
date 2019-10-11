@@ -6,7 +6,7 @@
         <title>TOTOTOTO</title>
     </head>
     <body>
-        <div id="content">
+        <div id="users">
             azeazeaze
         </div>
     </body>
@@ -14,8 +14,6 @@
 
 
 <script>
-
-
 
 setInterval(function() {
   console.log("toto");
@@ -30,11 +28,36 @@ fetch("/user")
     return response.json()
   })
   .then(data => {
-    // Work with JSON data here
-    console.log(data)
+
+  /*  <table style="width:100%">
+      <tr>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Age</th>
+      </tr>
+      <tr>
+        <td>Jill</td>
+        <td>Smith</td>
+        <td>50</td>
+      </tr>
+      <tr>
+        <td>Eve</td>
+        <td>Jackson</td>
+        <td>94</td>
+      </tr>
+    </table>  */
+
+    let output = '';
+    output += '<table> <tr><th>Email</th><th>Points</th></tr>';
+  for(var i = 0; i < data.length; i++) {
+    var obj = data[i];
+    output += '<tr><td>'+obj.email+'</td> <td>' + obj.points +  ' points </td></tr>';
+    document.getElementById('users').innerHTML = output;
+  }
+  output += '</table>'
   })
   .catch(err => {
-    // Do something for an error here
+    console.log("erreur json");
   })
 }, 1000);
 function reloadUser(data){

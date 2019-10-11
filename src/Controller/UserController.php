@@ -28,7 +28,7 @@ class UserController extends AbstractController
       $repository = $this->getDoctrine()
                    ->getManager()
                    ->getRepository('App\Entity\User');
-      $user = $repository->findAll();
+      $user = $repository->findBy([], ['points' => 'DESC']);
       if ($user == NULL)
       {
         $data = json_encode(array(
@@ -49,7 +49,7 @@ class UserController extends AbstractController
     /**
     * @Route("/user/{email}", methods={"GET"}, name="get_user")
     */
-    
+
     public function OneUser($email)
     {
       $repository = $this->getDoctrine()
