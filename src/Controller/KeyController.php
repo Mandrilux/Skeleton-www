@@ -13,7 +13,7 @@ class KeyController extends ApiController
 {
 
     /**
-    * @Route("/user/key", methods={"POST"}, name="set_key")
+    * @Route("/user/key", methods={"PUT"}, name="set_key")
     */
 
     public function setKey(Request $request)
@@ -31,6 +31,7 @@ class KeyController extends ApiController
       $data = json_encode(array(
             "key"=> $user->getApikey()
       ));
+      $this->saveHistory($request, $user);
       return $this->httpCreated($data);
     }
 
@@ -43,7 +44,6 @@ class KeyController extends ApiController
       $em = $this->getDoctrine()->getManager();
       $username = $request->headers->get('php-auth-user');
       $aToken = $request->headers->get('php-auth-pw');
-
       $user = $em->getRepository("App\Entity\User")->findOneBy(['email' => $username, 'password' => $aToken]);
       if ($user == NULL)
       {
@@ -52,6 +52,7 @@ class KeyController extends ApiController
         $data = json_encode(array(
             "key"=> $user->getApikey()
       ));
+      $this->saveHistory($request, $user);
       return $this->httpCreated($data);
     }
 }

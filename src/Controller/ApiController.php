@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Entity\History;
 
 class ApiController extends AbstractController
 {
@@ -40,6 +41,16 @@ class ApiController extends AbstractController
     return $response;
   }
 
+  public function saveHistory($request, $user)
+  {
+    $em = $this->getDoctrine()->getManager();
+    $routename = $request->server->get("PATH_INFO");
+    $routemethode = $request->server->get("REQUEST_METHOD");
+    $history = new History($routename, $routemethode, $user);
+    $em->persist($history);
+    $em->flush();
+  }
+
   public function jsoncheck($json){
     $result = json_decode($json);
     if ($result == NULL)
@@ -48,4 +59,8 @@ class ApiController extends AbstractController
     }
     return true;
   }
+
+
+
+
 }

@@ -61,40 +61,9 @@ class UserController extends ApiController
         return ($this->httpForbiden("Bad credential !"));
       }
       $data = $this->serializer->serialize($user, 'json');
+      $this->saveHistory($request, $user);
       return $this->httpCreated($data);
     }
-
-
-
-    /**
-    * @Route("/user", methods={"PUT"}, name="update_user")
-    */
-
-   public function UpdateUser(Request $request, ValidatorInterface $validator)
-   {
-     $apikey = $request->headers->get('x-key');
-     if ($apikey == NULL)
-     {
-       return ($this->badRequest("Missing key !"));
-     }
-     $repository = $this->getDoctrine()
-                  ->getManager()
-                  ->getRepository('App\Entity\User');
-     $user = $repository->findOneBy(array('apikey' => $apikey));
-     if ($user == NULL){
-       return ($this->httpForbiden("Bad credential !"));
-     }
-
-     $data = $request->getContent();
-     if (!$this->jsoncheck($data)){
-       return ($this->badRequest("Json format is invalid"));
-     }
-
-     /*$user2 =  $this->serializer->deserialize($data, $user, 'json');
-     var_dump($user);
-     exit(0);*/
-     // à completer pour update les user
-   }
 
     /**
     * @Route("/user", methods={"POST"}, name="create_user")
@@ -112,7 +81,7 @@ class UserController extends ApiController
     if (count($errors) > 0) {
         return ($this->badRequest($errors[0]->getMessage()));
      }
-     $acceptedDomains = array('epitech.eu');
+    $acceptedDomains = array('epitech.eu');
     if(!in_array(substr($user->getEmail(), strrpos($user->getEmail(), '@') + 1), $acceptedDomains)){
       return ($this->badRequest("Email must be an Epitech email (prenom.nom@epitech.eu)"));
     }
@@ -123,6 +92,7 @@ class UserController extends ApiController
         "email"=> $user->getEmail(),
         "key"=>$user->getApikey(),
     ));
+    $this->saveHistory($request, $user);
     return $this->httpCreated($data);
   }
 }
