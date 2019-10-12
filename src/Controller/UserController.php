@@ -20,11 +20,14 @@ class UserController extends AbstractController
     }
 
     /**
-    * @Route("/user", methods={"GET"}, name="get_users")
+    * @Route("/users", methods={"GET"}, name="get_users")
     */
 
     public function AllUser()
     {
+        $apikey = $request->headers->get('x-key');
+        echo $apikey;
+        exit(0);
       $repository = $this->getDoctrine()
                    ->getManager()
                    ->getRepository('App\Entity\User');
@@ -118,5 +121,4 @@ class UserController extends AbstractController
     $response->headers->set('Content-Type', 'application/json');
     return $response;
   }
-
 }
