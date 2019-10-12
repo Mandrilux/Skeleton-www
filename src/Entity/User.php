@@ -22,8 +22,13 @@ class User
        /*$this->name = $name;*/
        $this->create_at = new \Datetime();
        $this->last_request = new \Datetime();
-       $this->apikey = implode('-', str_split(substr(strtolower(md5(microtime().rand(1000, 9999))), 0, 30), 6));
+       $this->genKey();
    }
+
+   public function genKey(){
+     $this->apikey = implode('-', str_split(substr(strtolower(md5(microtime().rand(1000, 9999))), 0, 30), 6));
+   }
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -39,6 +44,14 @@ class User
      */
 
     private $email;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotNull(message="Le mot de passe doit être renseigné")
+     * @Assert\Length(min="6", max="150", minMessage="Le mot de passe doit contenir au moins 6 caractères", maxMessage="Le mot de passe doit contenir au maximum 150 caractères")
+     */
+
+    private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -121,6 +134,18 @@ class User
     public function setApikey(string $apikey): self
     {
         $this->apikey = $apikey;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
 
         return $this;
     }
