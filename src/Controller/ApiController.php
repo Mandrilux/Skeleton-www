@@ -47,6 +47,8 @@ class ApiController extends AbstractController
     $routename = $request->server->get("PATH_INFO");
     $routemethode = $request->server->get("REQUEST_METHOD");
     $history = new History($routename, $routemethode, $user);
+    $user->setLastRequest(New \datetime());
+    $em->persist($user);
     $em->persist($history);
     $em->flush();
   }
