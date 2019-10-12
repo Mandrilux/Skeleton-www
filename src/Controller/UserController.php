@@ -58,19 +58,30 @@ class UserController extends AbstractController
 
 
     /**
-    * @Route("/user/{email}", methods={"GET"}, name="get_user")
+    * @Route("/user", methods={"GET"}, name="get_user")
     */
 
-    public function OneUser($email)
+    public function OneUser(Request $request)
     {
+      $apikey = $request->headers->get('x-key');
+      if ($apikey == NULL)
+      {
+        $data = json_encode(array(
+            "error"=> "bad credential !"
+        ));
+        $response =  new Response($data);
+        $response->setStatusCode(Response::HTTP_FORBIDDEN );
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+      }
       $repository = $this->getDoctrine()
                    ->getManager()
                    ->getRepository('App\Entity\User');
-      $user = $repository->findOneBy(array('email' => $email));
+      $user = $repository->findOneBy(array('apikey' => $apikey));
       if ($user == NULL)
       {
         $data = json_encode(array(
-            "error"=> "Utilisateur inconnu !"
+            "error"=> "bad credential !"
         ));
         $response =  new Response($data);
         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
