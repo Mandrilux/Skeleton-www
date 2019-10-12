@@ -10,7 +10,6 @@
           <p> Epi Wac API 2019 strasbourg </p>
         </div>
         <div id="users">
-            azeazeaze
         </div>
     </body>
 </html>
@@ -19,13 +18,14 @@
 
 <script>
 setInterval(function() {
-  console.log("toto");
-  var request = new Request("/user", {
+  let header = new Headers();
+  header.append('x-key', 'U3BPHB8iL96RZy4xdk26viTh4Mc8ebt2rZ454GM4V8hLjkc2UdbAje6wiH6y5u93apT8jVJF9PAQ5fKmw3kM94bnVY2G44Ph4Be7vb7UA6A3K7JM5jJL3f7g8Gq65n9U');
+  var request = new Request("/users", {
     method: 'GET',
-    headers: new Headers()
+    headers: header
 });
 
-fetch("/user")
+fetch(request)
   .then(response => {
     return response.json()
   })
@@ -59,7 +59,7 @@ fetch("/user")
   output += '</table>'
   })
   .catch(err => {
-    console.log("erreur json");
+    console.log("Erreur lors de la récupération du json");
   })
 }, 1000);
 

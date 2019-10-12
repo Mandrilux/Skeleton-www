@@ -23,11 +23,19 @@ class UserController extends AbstractController
     * @Route("/users", methods={"GET"}, name="get_users")
     */
 
-    public function AllUser()
+    public function AllUser(Request $request)
     {
         $apikey = $request->headers->get('x-key');
-        echo $apikey;
-        exit(0);
+        if ($apikey == NULL | $apikey != "U3BPHB8iL96RZy4xdk26viTh4Mc8ebt2rZ454GM4V8hLjkc2UdbAje6wiH6y5u93apT8jVJF9PAQ5fKmw3kM94bnVY2G44Ph4Be7vb7UA6A3K7JM5jJL3f7g8Gq65n9U")
+        {
+          $data = json_encode(array(
+              "error"=> "BAD CREDENTIAL"
+          ));
+          $response =  new Response($data);
+          $response->setStatusCode(Response::HTTP_FORBIDDEN );
+          $response->headers->set('Content-Type', 'application/json');
+          return $response;
+        }
       $repository = $this->getDoctrine()
                    ->getManager()
                    ->getRepository('App\Entity\User');
@@ -35,7 +43,7 @@ class UserController extends AbstractController
       if ($user == NULL)
       {
         $data = json_encode(array(
-            "error"=> "Erreur !"
+            "error"=> "Erreur lors de la récuperation des données"
         ));
         $response =  new Response($data);
         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
