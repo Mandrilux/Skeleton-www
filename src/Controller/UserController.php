@@ -2,7 +2,6 @@
 // src/Controller/BlogController.php
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,7 +10,7 @@ use App\Entity\User;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use JMS\Serializer\SerializerInterface;
 
-class UserController extends AbstractController
+class UserController extends ApiController
 {
     private $serializer;
 
@@ -28,13 +27,7 @@ class UserController extends AbstractController
         $apikey = $request->headers->get('x-key');
         if ($apikey == NULL | $apikey != "U3BPHB8iL96RZy4xdk26viTh4Mc8ebt2rZ454GM4V8hLjkc2UdbAje6wiH6y5u93apT8jVJF9PAQ5fKmw3kM94bnVY2G44Ph4Be7vb7UA6A3K7JM5jJL3f7g8Gq65n9U")
         {
-          $data = json_encode(array(
-              "error"=> "BAD CREDENTIAL"
-          ));
-          $response =  new Response($data);
-          $response->setStatusCode(Response::HTTP_FORBIDDEN );
-          $response->headers->set('Content-Type', 'application/json');
-          return $response;
+            return ($this->httpForbiden("Bad credential !"));
         }
       $repository = $this->getDoctrine()
                    ->getManager()
@@ -42,18 +35,10 @@ class UserController extends AbstractController
       $user = $repository->findBy([], ['points' => 'DESC']);
       if ($user == NULL)
       {
-        $data = json_encode(array(
-            "error"=> "Erreur lors de la récuperation des données"
-        ));
-        $response =  new Response($data);
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+        return ($this->httpForbiden("Error database !"));
       }
       $data = $this->serializer->serialize($user, 'json');
-      $response =  new Response($data);
-      $response->headers->set('Content-Type', 'application/json');
-      return $response;
+      return $this->httpCreated($data);
     }
 
 
@@ -66,78 +51,78 @@ class UserController extends AbstractController
       $apikey = $request->headers->get('x-key');
       if ($apikey == NULL)
       {
-        $data = json_encode(array(
-            "error"=> "bad credential !"
-        ));
-        $response =  new Response($data);
-        $response->setStatusCode(Response::HTTP_FORBIDDEN );
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+        return ($this->badRequest("Missing key !"));
       }
       $repository = $this->getDoctrine()
                    ->getManager()
                    ->getRepository('App\Entity\User');
       $user = $repository->findOneBy(array('apikey' => $apikey));
-      if ($user == NULL)
-      {
-        $data = json_encode(array(
-            "error"=> "bad credential !"
-        ));
-        $response =  new Response($data);
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+      if ($user == NULL){
+        return ($this->httpForbiden("Bad credential !"));
       }
       $data = $this->serializer->serialize($user, 'json');
-      $response =  new Response($data);
-      $response->headers->set('Content-Type', 'application/json');
-      return $response;
+      return $this->httpCreated($data);
     }
 
+
+
+    /**
+    * @Route("/user", methods={"PUT"}, name="update_user")
+    */
+
+   public function UpdateUser(Request $request, ValidatorInterface $validator)
+   {
+     $apikey = $request->headers->get('x-key');
+     if ($apikey == NULL)
+     {
+       return ($this->badRequest("Missing key !"));
+     }
+     $repository = $this->getDoctrine()
+                  ->getManager()
+                  ->getRepository('App\Entity\User');
+     $user = $repository->findOneBy(array('apikey' => $apikey));
+     if ($user == NULL){
+       return ($this->httpForbiden("Bad credential !"));
+     }
+
+     $data = $request->getContent();
+     if (!$this->jsoncheck($data)){
+       return ($this->badRequest("Json format is invalid"));
+     }
+
+     /*$user2 =  $this->serializer->deserialize($data, $user, 'json');
+     var_dump($user);
+     exit(0);*/
+     // à completer pour update les user
+   }
 
     /**
     * @Route("/user", methods={"POST"}, name="create_user")
     */
+
    public function CreateUser(Request $request, ValidatorInterface $validator)
    {
     $data = $request->getContent();
+    if (!$this->jsoncheck($data)){
+      return ($this->badRequest("Json format is invalid"));
+    }
     $user =  $this->serializer->deserialize($data, 'App\Entity\User', 'json');
     $user->init();
-
     $errors = $validator->validate($user);
     if (count($errors) > 0) {
-         $errorsString = $errors[0]->getMessage();
-         $data = json_encode(array(
-             "error"=> $errorsString
-         ));
-         $response =  new Response($data);
-         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-         $response->headers->set('Content-Type', 'application/json');
-         return $response;
+        return ($this->badRequest($errors[0]->getMessage()));
      }
-
      $acceptedDomains = array('epitech.eu');
-    if(!in_array(substr($user->getEmail(), strrpos($user->getEmail(), '@') + 1), $acceptedDomains))
-    {
-      $data = json_encode(array(
-          "error"=> "L'email doit etre un email Epitech (prenom.nom@epitech.eu)"
-      ));
-      $response =  new Response($data);
-      $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-      $response->headers->set('Content-Type', 'application/json');
-      return $response;
+    if(!in_array(substr($user->getEmail(), strrpos($user->getEmail(), '@') + 1), $acceptedDomains)){
+      return ($this->badRequest("Email must be an Epitech email (prenom.nom@epitech.eu)"));
     }
-
     $em = $this->getDoctrine()->getManager();
     $em->persist($user);
     $em->flush();
     $data = json_encode(array(
         "email"=> $user->getEmail(),
-        "key"=>$user->getApikey()
+        "key"=>$user->getApikey(),
     ));
-    $response =  new Response($data);
-    $response->setStatusCode(Response::HTTP_CREATED);
-    $response->headers->set('Content-Type', 'application/json');
-    return $response;
+    return $this->httpCreated($data);
   }
 }
