@@ -27,6 +27,12 @@ class User
        $this->genKey();
    }
 
+   public function updatePoints(int $points): self
+   {
+       $this->points += $points;
+       return $this;
+   }
+
    public function genKey(){
      $this->apikey = implode('-', str_split(substr(strtolower(md5(microtime().rand(1000, 9999))), 0, 30), 6));
    }

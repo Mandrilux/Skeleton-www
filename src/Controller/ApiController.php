@@ -43,10 +43,17 @@ class ApiController extends AbstractController
 
   public function saveHistory($request, $user)
   {
+
     $em = $this->getDoctrine()->getManager();
     $routename = $request->server->get("PATH_INFO");
     $routemethode = $request->server->get("REQUEST_METHOD");
-    $history = new History($routename, $routemethode, $user);
+    $ip = $request->server->get("REMOTE_ADDR");
+    $history = new History($routename, $routemethode, $user, $ip);
+    $flag = $em->getRepository("App\Entity\History")->findOneBy(['name' => $routename, 'method' => $routemethode, 'user' => $user]);
+    if ($flag == NULL)
+    {
+      $user->updatePoints(50);
+    }
     $user->setLastRequest(New \datetime());
     $em->persist($user);
     $em->persist($history);

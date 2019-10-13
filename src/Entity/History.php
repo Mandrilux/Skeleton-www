@@ -10,11 +10,13 @@ use Doctrine\ORM\Mapping as ORM;
 class History
 {
 
-  public function __construct($name, $method, $user)
+  public function __construct($name, $method, $user, $ip)
    {
        $this->name = $name;
        $this->method = $method;
        $this->user = $user;
+       $this->ip = $ip;
+       $this->create_at = new \DateTime();
 
    }
     /**
@@ -36,10 +38,20 @@ class History
     private $method;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $ip;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="histories")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $create_at;
 
     public function getId(): ?int
     {
@@ -78,6 +90,30 @@ class History
     public function setMethod(string $method): self
     {
         $this->method = $method;
+
+        return $this;
+    }
+
+    public function getCreateAt(): ?\DateTimeInterface
+    {
+        return $this->create_at;
+    }
+
+    public function setCreateAt(\DateTimeInterface $create_at): self
+    {
+        $this->create_at = $create_at;
+
+        return $this;
+    }
+
+    public function getIp(): ?string
+    {
+        return $this->ip;
+    }
+
+    public function setIp(string $ip): self
+    {
+        $this->ip = $ip;
 
         return $this;
     }
