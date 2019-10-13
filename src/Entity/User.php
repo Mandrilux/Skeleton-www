@@ -61,6 +61,13 @@ class User
 
     private $password;
 
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+
+     private $nickname = "";
+
     /**
      * @ORM\Column(type="string", length=255)
      */
@@ -195,6 +202,18 @@ class User
                 $history->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNickname(): ?string
+    {
+        return $this->nickname;
+    }
+
+    public function setNickname(string $nickname): self
+    {
+        $this->nickname = $nickname;
 
         return $this;
     }
