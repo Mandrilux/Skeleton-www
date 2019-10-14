@@ -69,7 +69,27 @@ class ApiController extends AbstractController
     return true;
   }
 
-
-
-
+  public function LoginEpitech($user, $passwd){
+        $passwd = hash("sha512", $passwd);
+        $passwd = hash_hmac("sha512", $user, $passwd);
+        $data = array("user" => $user, "signature" => $passwd);
+        $data = json_encode($data);
+        $curl = curl_init('https://blih.epitech.eu/whoami');
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($data),
+                'User-Agent: EpiApi 0.1')
+        );
+        $result = curl_exec($curl);
+        $result = json_decode($result, true);
+        if (isset($result['error'])){
+          return false;
+        }
+        else{
+          return true;
+        }
+  }
 }

@@ -19,13 +19,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class User
 {
 
-  public function init()
-   {
-       /*$this->name = $name;*/
-       $this->create_at = new \Datetime();
-       $this->last_request = new \Datetime();
-       $this->genKey();
-   }
+  public function __construct($email){
+    $this->email = $email;
+    $this->create_at = new \Datetime();
+    $this->last_request = new \Datetime();
+    $this->nickname = "";
+    $this->genKey();
+    $this->histories = new ArrayCollection();
+  }
 
    public function updatePoints(int $points): self
    {
@@ -53,20 +54,12 @@ class User
 
     private $email;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotNull(message="Le mot de passe doit être renseigné")
-     * @Assert\Length(min="6", max="150", minMessage="Le mot de passe doit contenir au moins 6 caractères", maxMessage="Le mot de passe doit contenir au maximum 150 caractères")
-     */
-
-    private $password;
-
 
     /**
      * @ORM\Column(type="string", length=255)
      */
 
-     private $nickname = "";
+     private $nickname;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -93,10 +86,6 @@ class User
      */
     private $histories;
 
-    public function __construct()
-    {
-        $this->histories = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -163,17 +152,6 @@ class User
         return $this;
     }
 
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
 
     /**
      * @return Collection|History[]

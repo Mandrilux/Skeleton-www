@@ -75,15 +75,20 @@ class UserController extends ApiController
     if (!$this->jsoncheck($data)){
       return ($this->badRequest("Json format is invalid"));
     }
-    $user =  $this->serializer->deserialize($data, 'App\Entity\User', 'json');
-    $user->init();
+    $datadecode =json_decode($data, true);
+    if (!isset($datadecode["email"])|| !isset($datadecode["password"]))
+    {
+        return ($this->badRequest("Missing parameters"));
+    }
+    $email = $datadecode["email"];
+    $password = $datadecode["password"];
+    $user = new User($email);
     $errors = $validator->validate($user);
     if (count($errors) > 0) {
         return ($this->badRequest($errors[0]->getMessage()));
      }
-    $acceptedDomains = array('epitech.eu');
-    if(!in_array(substr($user->getEmail(), strrpos($user->getEmail(), '@') + 1), $acceptedDomains)){
-      return ($this->badRequest("Email must be an Epitech email (prenom.nom@epitech.eu)"));
+    if ($this->LoginEpitech($email, $password) == false){
+      return ($this->httpForbiden("Bad credential !"));
     }
     $em = $this->getDoctrine()->getManager();
     $em->persist($user);
