@@ -21,10 +21,10 @@ class KeyController extends ApiController
       $em = $this->getDoctrine()->getManager();
       $username = $request->headers->get('php-auth-user');
       $aToken = $request->headers->get('php-auth-pw');
-      $user = $em->getRepository("App\Entity\User")->findOneBy(['email' => $username, 'password' => $aToken]);
-      if ($user == NULL){
+      if ($this->LoginEpitech($username, $aToken) == false){
         return ($this->httpForbiden("Bad credential !"));
       }
+      $user = $em->getRepository("App\Entity\User")->findOneBy(['email' => $username]);
       $user->genKey();
       $em->persist($user);
       $em->flush();
@@ -44,11 +44,10 @@ class KeyController extends ApiController
       $em = $this->getDoctrine()->getManager();
       $username = $request->headers->get('php-auth-user');
       $aToken = $request->headers->get('php-auth-pw');
-      $user = $em->getRepository("App\Entity\User")->findOneBy(['email' => $username, 'password' => $aToken]);
-      if ($user == NULL)
-      {
+      if ($this->LoginEpitech($username, $aToken) == false){
         return ($this->httpForbiden("Bad credential !"));
       }
+      $user = $em->getRepository("App\Entity\User")->findOneBy(['email' => $username]);
         $data = json_encode(array(
             "key"=> $user->getApikey()
       ));
