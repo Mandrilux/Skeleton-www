@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
 
 class UserController extends ApiController
 {
@@ -16,6 +17,55 @@ class UserController extends ApiController
 
     public function __construct(SerializerInterface $serializer){
       $this->serializer= $serializer;
+    }
+
+
+    /**
+    * @Route("/user", methods={"PUT"}, name="set_nickname")
+    */
+
+      public function DeleteUser(Request $request)
+    {
+      exit(0);
+   }
+    /**
+    * @Route("/user", methods={"DEL"}, name="Delete user")
+    */
+
+    public function NicknameUser(Request $request)
+    {
+      $data = $request->getContent();
+      if (!$this->jsoncheck($data)){
+        return ($this->badRequest("Json format is invalid"));
+      }
+      $datadecode =json_decode($data, true);
+      if (!isset($datadecode["nickname"]))
+      {
+          return ($this->badRequest("Missing parameter nickname"));
+      }
+      $apikey = $request->headers->get('x-key');
+      if ($apikey == NULL)
+      {
+        return ($this->badRequest("Missing key !"));
+      }
+      $repository = $this->getDoctrine()
+                   ->getManager()
+                   ->getRepository('App\Entity\User');
+      $user = $repository->findOneBy(array('apikey' => $apikey));
+      if ($user == NULL){
+        return ($this->httpForbiden("Bad credential !"));
+      }
+      $user->setNickname($datadecode["nickname"]);
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($user);
+      $em->flush();
+    /*  $data = json_encode(array(
+          "email"=> $user->getEmail(),
+          "nickname"=>$user->getNickname(),
+      ));*/
+      $data = $this->serializer->serialize($user, 'json' , SerializationContext::create()->setGroups(array('nickname')));
+      $this->saveHistory($request, $user);
+      return $this->httpOk($data);
     }
 
     /**
@@ -29,15 +79,35 @@ class UserController extends ApiController
         {
             return ($this->httpForbiden("Bad credential !"));
         }
-      $repository = $this->getDoctrine()
+
+        try {
+          $repository = $this->getDoctrine()
+                       ->getManager()
+                       ->getRepository('App\Entity\User');
+          $users = $repository->findBy([], ['points' => 'DESC']);
+          if ($users == NULL)
+          {
+            return ($this->httpForbiden("Error database !"));
+          }
+        }
+        catch(DBALException $e){
+          return ($this->badRequest($errorMessage = $e->getMessage()));
+        //  $errorMessage = $e->getMessage();
+        }
+        catch(\Exception $e){
+            return ($this->badRequest($e->getMessage()));
+        }
+    /*  $repository = $this->getDoctrine()
                    ->getManager()
                    ->getRepository('App\Entity\User');
-      $user = $repository->findBy([], ['points' => 'DESC']);
-      if ($user == NULL)
+      $users = $repository->findBy([], ['points' => 'DESC']);
+      if ($users == NULL)
       {
         return ($this->httpForbiden("Error database !"));
-      }
-      $data = $this->serializer->serialize($user, 'json');
+      }*/
+
+      $data = $this->serializer->serialize($users, 'json' , SerializationContext::create()->setGroups(array('listUser')));
+      //$data = $this->serializer->serialize($users, 'json');
       return $this->httpCreated($data);
     }
 
@@ -62,7 +132,7 @@ class UserController extends ApiController
       }
       $data = $this->serializer->serialize($user, 'json');
       $this->saveHistory($request, $user);
-      return $this->httpCreated($data);
+      return $this->httpOk($data);
     }
 
     /**

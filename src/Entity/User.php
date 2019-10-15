@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -50,6 +51,7 @@ class User
      * @ORM\Column(name="email", type="string", length=100, unique=true)
      * @Assert\Email(message="Mauvais format d'email")
      * @Assert\Length(min="14", max="150", minMessage="Mauvais format d'email", maxMessage="Mauvais format d'email")
+    * @Serializer\Groups({"listUser", "nickname"})
      */
 
     private $email;
@@ -57,17 +59,19 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255)
+      * @Serializer\Groups({"nickname"})
      */
 
      private $nickname;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
+    * @ORM\Column(type="string", length=255)
+    */
     private $apikey;
 
     /**
      * @ORM\Column(type="integer")
+     * @Serializer\Groups({"listUser", "nickname"})
      */
     private $points = 0;
 
@@ -78,6 +82,7 @@ class User
 
     /**
      * @ORM\Column(type="datetime")
+     * @Serializer\Groups({"listUser"})
      */
     private $last_request;
 

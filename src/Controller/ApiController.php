@@ -30,6 +30,13 @@ class ApiController extends AbstractController
     return $response;
   }
 
+  public function httpOk($data){
+    $response =  new Response($data);
+    $response->setStatusCode(Response::HTTP_OK);
+    $response->headers->set('Content-Type', 'application/json');
+    return $response;
+  }
+
   public function httpForbiden($error){
     $data = json_encode(array(
         "error"=> $error,
