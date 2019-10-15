@@ -3,13 +3,17 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>TOTOTOTO</title>
+        <title>Epi Wac 2019</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="{{ asset('css/main.css') }}?v1.4">
     </head>
     <body>
         <div id="header">
           <p> Epi Wac API 2019 strasbourg </p>
         </div>
-        <div id="users">
+        <div class="container tab">
+          <div id="users">
+          </div>
         </div>
     </body>
 </html>
@@ -30,31 +34,13 @@ fetch(request)
     return response.json()
   })
   .then(data => {
-
-  /*  <table style="width:100%">
-      <tr>
-        <th>Firstname</th>
-        <th>Lastname</th>
-        <th>Age</th>
-      </tr>
-      <tr>
-        <td>Jill</td>
-        <td>Smith</td>
-        <td>50</td>
-      </tr>
-      <tr>
-        <td>Eve</td>
-        <td>Jackson</td>
-        <td>94</td>
-      </tr>
-    </table>  */
-
     console.log(data);
     let output = '';
-    output += '<table> <tr><th>Email</th><th>Points</th></tr>';
+    output += '<table class="table"> <tr><th scope="col">#</th><th scope="col">Email</th><th scope="col">Points</th></tr>';
   for(var i = 0; i < data.length; i++) {
     var obj = data[i];
-    output += '<tr><td>'+obj.email+'</td> <td>' + obj.points +  ' points </td></tr>';
+    var flag = i + 1
+    output += '<tr><th scope="row">'+ flag + '</th><td>'+obj.email+'</td> <td>' + obj.points +  ' points </td></tr>';
     document.getElementById('users').innerHTML = output;
   }
   output += '</table>'
