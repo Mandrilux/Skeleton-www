@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use JMS\Serializer\SerializationContext;
 
 class KeyController extends ApiController
 {

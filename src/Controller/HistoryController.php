@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
 
 class HistoryController extends ApiController
 {
@@ -16,21 +17,73 @@ class HistoryController extends ApiController
     $this->serializer= $serializer;
   }
 
+
+
+  /**
+  * @Route("/request", methods={"GET"}, name="get_all_request")
+  */
+
+ public function getAllRequest(Request $request)
+ {
+  /* $apikey = $request->headers->get('x-key');
+   if ($apikey == NULL)
+   {
+     return ($this->badRequest("Missing key !"));
+   }
+   $repository = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('App\Entity\User');
+   $user = $repository->findOneBy(array('apikey' => $apikey));
+   if ($user == NULL){
+     return ($this->httpForbiden("Bad credential !"));
+   }*/
+   $repository = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('App\Entity\History');
+   $requests = $repository->findBy([]);
+   if ($requests == NULL)
+   {
+     return ($this->httpForbiden("No request found !"));
+   }
+    //  $this->saveHistory($request, $user);
+     $data = $this->serializer->serialize($requests, 'json' , SerializationContext::create()->setGroups(array('getRequest')));
+
+   //$data = $this->serializer->serialize($user, 'json');
+   return $this->httpCreated($data);
+ }
+
+
+
     /**
-    * @Route("/request", methods={"GET"}, name="get_request")
+    * @Route("/user/request", methods={"GET"}, name="get_request")
     */
 
-   public function Index(Request $request)
+   public function getUserRequest(Request $request)
    {
+     $apikey = $request->headers->get('x-key');
+     if ($apikey == NULL)
+     {
+       return ($this->badRequest("Missing key !"));
+     }
+     $repository = $this->getDoctrine()
+                  ->getManager()
+                  ->getRepository('App\Entity\User');
+     $user = $repository->findOneBy(array('apikey' => $apikey));
+     if ($user == NULL){
+       return ($this->httpForbiden("Bad credential !"));
+     }
      $repository = $this->getDoctrine()
                   ->getManager()
                   ->getRepository('App\Entity\History');
-     $user = $repository->findBy([]);
-     if ($user == NULL)
+     $requests = $repository->findBy(["user" => $user]);
+     if ($requests == NULL)
      {
        return ($this->httpForbiden("Error database !"));
      }
-     $data = $this->serializer->serialize($user, 'json');
+        $this->saveHistory($request, $user);
+       $data = $this->serializer->serialize($requests, 'json' , SerializationContext::create()->setGroups(array('getRequest')));
+
+     //$data = $this->serializer->serialize($user, 'json');
      return $this->httpCreated($data);
    }
 }

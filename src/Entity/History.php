@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\HistoryRepository")
@@ -28,17 +29,20 @@ class History
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Serializer\Groups({"getRequest"})
      */
     private $name;
 
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Serializer\Groups({"getRequest"})
      */
     private $method;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Serializer\Groups({"getRequest"})
      */
     private $ip;
 
@@ -50,6 +54,7 @@ class History
 
     /**
      * @ORM\Column(type="datetime")
+     * @Serializer\Groups({"getRequest"})
      */
     private $create_at;
 
