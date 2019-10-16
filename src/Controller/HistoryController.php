@@ -40,10 +40,10 @@ class HistoryController extends ApiController
    $repository = $this->getDoctrine()
                 ->getManager()
                 ->getRepository('App\Entity\History');
-   $requests = $repository->findBy([]);
+   $requests = $repository->findBy(array(), array('create_at'=>'desc'));
    if ($requests == NULL)
    {
-     return ($this->httpForbiden("No request found !"));
+     return ($this->badRequest("No request found !"));
    }
     //  $this->saveHistory($request, $user);
      $data = $this->serializer->serialize($requests, 'json' , SerializationContext::create()->setGroups(array('getRequest')));
@@ -75,10 +75,10 @@ class HistoryController extends ApiController
      $repository = $this->getDoctrine()
                   ->getManager()
                   ->getRepository('App\Entity\History');
-     $requests = $repository->findBy(["user" => $user]);
+     $requests = $repository->findBy(array("user" => $user), array('create_at'=>'desc'));
      if ($requests == NULL)
      {
-       return ($this->httpForbiden("Error database !"));
+       return ($this->badRequest("Error database !"));
      }
         $this->saveHistory($request, $user);
        $data = $this->serializer->serialize($requests, 'json' , SerializationContext::create()->setGroups(array('getRequest')));
