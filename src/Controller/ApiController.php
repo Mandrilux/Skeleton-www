@@ -23,6 +23,17 @@ class ApiController extends AbstractController
     return $response;
   }
 
+  public function httpDelete($str){
+    $data = json_encode(array(
+        "status"=> $str,
+        "code" => 204
+    ));
+    $response =  new Response($data);
+    $response->setStatusCode(204);
+    $response->headers->set('Content-Type', 'application/json');
+    return $response;
+  }
+
   public function httpCreated($data){
     $response =  new Response($data);
     $response->setStatusCode(Response::HTTP_CREATED);
@@ -88,7 +99,7 @@ class ApiController extends AbstractController
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
                 'Content-Type: application/json',
                 'Content-Length: ' . strlen($data),
-                'User-Agent: EpiApi 0.1')
+                'User-Agent: EpiApi 0.2')
         );
         $result = curl_exec($curl);
         $result = json_decode($result, true);

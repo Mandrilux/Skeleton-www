@@ -21,15 +21,31 @@ class UserController extends ApiController
 
 
     /**
-    * @Route("/user", methods={"PUT"}, name="set_nickname")
+    * @Route("/user", methods={"DELETE"}, name="delete_user")
     */
 
       public function DeleteUser(Request $request)
     {
-      exit(0);
-   }
+      $apikey = $request->headers->get('x-key');
+      if ($apikey == NULL)
+      {
+        return ($this->badRequest("Missing key !"));
+      }
+      $repository = $this->getDoctrine()
+                   ->getManager()
+                   ->getRepository('App\Entity\User');
+      $user = $repository->findOneBy(array('apikey' => $apikey));
+      if ($user == NULL){
+        return ($this->httpForbiden("Bad credential !"));
+      }
+      $em = $this->getDoctrine()->getManager();
+      $em->remove($user);
+      $em->flush();
+      return $this->httpDelete("User deleted !");
+    }
+
     /**
-    * @Route("/user", methods={"DEL"}, name="Delete user")
+    * @Route("/user", methods={"PUT"}, name="set_nickname")
     */
 
     public function NicknameUser(Request $request)
@@ -59,10 +75,6 @@ class UserController extends ApiController
       $em = $this->getDoctrine()->getManager();
       $em->persist($user);
       $em->flush();
-    /*  $data = json_encode(array(
-          "email"=> $user->getEmail(),
-          "nickname"=>$user->getNickname(),
-      ));*/
       $data = $this->serializer->serialize($user, 'json' , SerializationContext::create()->setGroups(array('nickname')));
       $this->saveHistory($request, $user);
       return $this->httpOk($data);
@@ -97,15 +109,6 @@ class UserController extends ApiController
         catch(\Exception $e){
             return ($this->badRequest($e->getMessage()));
         }
-    /*  $repository = $this->getDoctrine()
-                   ->getManager()
-                   ->getRepository('App\Entity\User');
-      $users = $repository->findBy([], ['points' => 'DESC']);
-      if ($users == NULL)
-      {
-        return ($this->httpForbiden("Error database !"));
-      }*/
-
       $data = $this->serializer->serialize($users, 'json' , SerializationContext::create()->setGroups(array('listUser')));
       //$data = $this->serializer->serialize($users, 'json');
       return $this->httpCreated($data);

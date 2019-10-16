@@ -87,7 +87,7 @@ class User
     private $last_request;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\History", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="App\Entity\History", mappedBy="user", cascade={"remove"})
      */
     private $histories;
 
