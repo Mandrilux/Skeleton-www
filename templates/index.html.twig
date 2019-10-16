@@ -72,11 +72,11 @@ fetch(request)
     .then(data => {
       console.log(data);
       let output = '';
-      output += '<table class="table"> <tr><th scope="col">Route</th><th scope="col">Flag</th><th scope="col">IP</th></tr>';
+      output += '<table class="table"> <tr><th scope="col">Route</th><th scope="col">Flag</th><th scope="col">IP</th><th scope="col">Date</th></tr>';
     for(var i = 0; i < data.length; i++) {
       var obj = data[i];
       var flag = i + 1
-      output += '<tr><th scope="row">'+ obj.name + '</th><td>'+obj.method+'</td> <td>' + obj.ip +  '</td></tr>';
+      output += '<tr><th scope="row">'+ obj.name + '</th><td>'+obj.method+'</td> <td>' + obj.ip +  '</td><td>' + obj.create_at.toString() +  '</td></tr>';
       document.getElementById('request').innerHTML = output;
     }
     output += '</table>'

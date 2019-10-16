@@ -144,7 +144,7 @@ class UserController extends ApiController
 
    public function CreateUser(Request $request, ValidatorInterface $validator)
    {
-    $data = $request->getContent();
+  /*  $data = $request->getContent();
     if (!$this->jsoncheck($data)){
       return ($this->badRequest("Json format is invalid"));
     }
@@ -152,9 +152,12 @@ class UserController extends ApiController
     if (!isset($datadecode["email"])|| !isset($datadecode["password"]))
     {
         return ($this->badRequest("Missing parameters"));
-    }
-    $email = $datadecode["email"];
-    $password = $datadecode["password"];
+    }*/
+
+    $email = $request->headers->get('php-auth-user');
+    $password = $request->headers->get('php-auth-pw');
+    /*$email = $datadecode["email"];
+    $password = $datadecode["password"];*/
     $user = new User($email);
     $errors = $validator->validate($user);
     if (count($errors) > 0) {

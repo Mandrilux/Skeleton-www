@@ -40,7 +40,7 @@ class HistoryController extends ApiController
    $repository = $this->getDoctrine()
                 ->getManager()
                 ->getRepository('App\Entity\History');
-   $requests = $repository->findBy(array(), array('create_at'=>'desc'));
+   $requests = $repository->findBy(array(), array('create_at'=>'desc'), 7, 0);
    if ($requests == NULL)
    {
      return ($this->badRequest("No request found !"));
