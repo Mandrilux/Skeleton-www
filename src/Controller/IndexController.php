@@ -7,7 +7,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Entity\User;
 
 class IndexController extends AbstractController
 {
@@ -15,7 +14,7 @@ class IndexController extends AbstractController
     * @Route("/", methods={"GET"}, name="index")
     */
 
-   public function Index(Request $request)
+   public function Index()
    {
       return $this->render('index.html.twig');
    }
